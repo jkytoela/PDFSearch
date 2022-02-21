@@ -1,0 +1,89 @@
+services:
+  frontend:
+    container_name: frontend
+    build: frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    networks:
+      - client-side
+    depends_on:
+      - backend
+
+  backend:
+    container_name: backend
+    restart: always
+    build: backend
+    environment:
+      - ADDRESS=0.0.0.0:8000
+      - PG_DBNAME=postgres
+      - PG_HOST=db
+      - PG_USER=postgres
+      - PG_PASSWORD=secret
+    volumes:
+      - ./backend:/usr/app
+    # depends_on:
+    #   - db
+    networks:
+      - client-side
+      - server-side
+    ports:
+      - 8000:8000
+
+  # db:
+  #   container_name: db
+  #   image: postgres:12-alpine
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_PASSWORD=secret
+  #   networks:
+  #     - server-side
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+
+  # redis:
+  #   container_name: redis
+  #   image: redis:alpine
+  #   restart: always
+  #   networks:
+  #     - server-side
+  #   expose:
+  #     - 6379
+
+  # elasticsearch:
+  #   container_name: elasticsearch
+  #   image: elasticsearch:7.16.1
+  #   environment:
+  #     discovery.type: single-node
+  #     ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+  #   ports:
+  #     - 9200:9200
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 3
+  #   networks:
+  #     - server-side
+
+  # kibana:
+  #   container_name: kibana
+  #   image: kibana:7.16.1
+  #   ports:
+  #     - 5601:5601
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - server-side
+
+networks:
+  client-side: {}
+  server-side: {}
+
+volumes:
+  db-data: {}
