@@ -33,6 +33,15 @@ services:
     ports:
       - 8000:8000
 
+  tika:
+    image:  apache/tika:1.28.1
+    restart: on-failure
+    networks:
+      - client-side
+      - server-side
+    ports:
+      - "9998:9998"
+
   # db:
   #   container_name: db
   #   image: postgres:12-alpine
