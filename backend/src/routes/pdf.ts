@@ -7,10 +7,12 @@ import {
   Router,
 } from 'express';
 import multer from 'multer';
+
 import extract from '../services/tika';
 import * as minio from '../services/minio';
 import * as db from '../services/db';
 import * as es from '../services/es';
+import redis from '../services/redis';
 import { BUCKET_NAME } from '../constants/minioConfig';
 
 const router = Router();
@@ -59,14 +61,22 @@ router.get('/', async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Invalid query' });
   }
 
+  const cache = await redis.get(`${text}`);
+  if (cache !== null) {
+    return res.status(200).json(JSON.parse(cache));
+  }
+
   // Get list of id's that match to the search
   const ids = await es.search(`${text}`);
   if (!ids) {
+    redis.setEx(`${text}`, 600, JSON.stringify([]));
     return res.status(200).json([]);
   }
 
   // Get the PDFs
   const data = await db.find(ids);
+  redis.setEx(`${text}`, 600, JSON.stringify(data));
+
   return res.status(200).json(data);
 });
 
