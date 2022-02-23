@@ -1,3 +1,5 @@
+# TODO: How to setup networks properly?
+
 # MinIO settings and configurations that are common for all containers
 x-minio-common: &minio-common
   image: quay.io/minio/minio:RELEASE.2022-02-18T01-50-10Z
@@ -109,6 +111,7 @@ services:
       - minio3
       - minio4
 
+  # PostgreSQL
   db:
     container_name: db
     image: postgres:12-alpine
@@ -122,6 +125,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  # Redis for caching the searches
   redis:
     container_name: redis
     image: redis:alpine
@@ -131,6 +135,7 @@ services:
     expose:
       - 6379
 
+  # ElasticSearch for indexing the texts from PDF files
   elasticsearch:
     container_name: elasticsearch
     image: elasticsearch:7.16.1
@@ -146,18 +151,9 @@ services:
       retries: 3
     networks:
       - server-side
+      - client-side
     expose:
       - 9200
-
-  # kibana:
-  #   container_name: kibana
-  #   image: kibana:7.16.1
-  #   ports:
-  #     - 5601:5601
-  #   depends_on:
-  #     - elasticsearch
-  #   networks:
-  #     - server-side
 
 networks:
   client-side: {}

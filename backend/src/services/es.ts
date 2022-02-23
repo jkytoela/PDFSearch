@@ -18,18 +18,43 @@ export async function index(id: number, data: string) {
   });
 }
 
+type Source = {
+  id: number;
+  data: string;
+};
+
+type SearchBody = {
+  index: string;
+  query: {
+    match: { data: string };
+  };
+  highlight: {
+    'fragment_size': string;
+    fields: {
+      data: unknown;
+    };
+  };
+};
+
 export async function search(str: string) {
   await client.indices.refresh({ index: DEFAULT_INDEX });
-  const result = await client.search<{ id: number; data: string }>({
+  const response = await client.search<Source, SearchBody>({
     index: DEFAULT_INDEX,
     query: {
       match: { data: str },
     },
+    highlight: {
+      fragment_size: 20,
+      fields: { data: {} },
+    },
   });
 
-  // Get only ID's from the results, because that's the only thing we need
-  const ids = result.hits.hits.map((hit) => hit._source!.id);
+  // Get ID's stored in DB and highlights
+  // TODO: Read more about ES types and fix those code smells
+  const result = response.hits.hits.map(({ _source, highlight }) => ({
+    id: _source!.id,
+    highlights: highlight!.data,
+  }));
 
-  // Remove duplicates
-  return [...new Set(ids)];
+  return result;
 }

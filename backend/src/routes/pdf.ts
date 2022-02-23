@@ -7,7 +7,6 @@ import {
   Router,
 } from 'express';
 import multer from 'multer';
-
 import extract from '../services/tika';
 import * as minio from '../services/minio';
 import * as db from '../services/db';
@@ -70,17 +69,25 @@ router.get('/', async (req: Request, res: Response) => {
   }
 
   // Get list of id's that match to the search
-  const ids = await es.search(`${text}`);
-  if (!ids) {
+  const searchResults = await es.search(`${text}`);
+  if (!searchResults) {
     redis.setEx(`${text}`, 600, JSON.stringify([]));
     return res.status(200).json([]);
   }
 
-  // Get the PDFs
-  const data = await db.find(ids);
-  redis.setEx(`${text}`, 600, JSON.stringify(data));
+  // SearchResults contains IDs used in the DB
+  const ids = searchResults.map((result) => result.id);
 
-  return res.status(200).json(data);
+  // Get the PDFs
+  const pdfs = await db.find(ids);
+
+  // Merge highlights with PDFs
+  const results = pdfs.map((item, i) => ({
+    ...item,
+    highlights: searchResults[i].highlights,
+  }));
+
+  return res.status(200).json(results);
 });
 
 export default router;

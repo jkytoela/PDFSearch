@@ -9,11 +9,7 @@ const SERVER_URL = 'http://localhost';
 const PORT = 8000;
 
 const app: Application = express();
-(async () => {
-  await redis.connect();
-})();
-
-// For development purposes
+redis.connect();
 app.use(cors());
 app.use(express.json());
 

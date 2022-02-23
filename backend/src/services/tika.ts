@@ -2,7 +2,7 @@ import got from 'got';
 import getStream from 'get-stream';
 import { Readable as ReadableStream } from 'stream';
 
-const TikaURL = 'http://tika:9998/tika';
+const tikaUrl = 'http://tika:9998/tika';
 
 function toReadableStream(value: Buffer) {
   return new ReadableStream({
@@ -20,7 +20,7 @@ function toReadableStream(value: Buffer) {
  */
 export default async function extract(input: Buffer) {
   const stream = toReadableStream(input);
-  const tikaStream = got.stream.put(TikaURL, {
+  const tikaStream = got.stream.put(tikaUrl, {
     headers: {
       Accept: 'text/plain',
     },
