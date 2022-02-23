@@ -16,8 +16,10 @@ export async function savePDF(filename: string, bucket: string, fileSize: number
   return res;
 }
 
-export async function find() {
-  const res = await prisma.pdf.findMany();
-  // eslint-disable-next-line no-console
-  return res;
+export async function find(ids: number[]) {
+  return prisma.pdf.findMany({
+    where: {
+      id: { in: ids },
+    },
+  });
 }
