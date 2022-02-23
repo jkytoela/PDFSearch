@@ -7,7 +7,8 @@ import {
   Router,
 } from 'express';
 import multer from 'multer';
-import extract from '../services/extract';
+import extract from '../services/tika';
+import * as minio from '../services/minio';
 
 const router = Router();
 const storage = multer.memoryStorage();
@@ -21,8 +22,8 @@ router.post('/', upload.array('files'), async (req: Request, res: Response) => {
   const textContent: string[] = [];
   await Promise.all(
     files.map(async (file) => {
-      const data = await extract(file.buffer);
-      textContent.push(data);
+      // const text = await extract(file.buffer);
+      minio.upload(file.originalname, file.buffer);
     }),
   );
 
