@@ -9,6 +9,8 @@ import {
 import multer from 'multer';
 import extract from '../services/tika';
 import * as minio from '../services/minio';
+import * as db from '../services/db';
+import { BUCKET_NAME } from '../constants/minioConfig';
 
 const router = Router();
 const storage = multer.memoryStorage();
@@ -22,12 +24,19 @@ router.post('/', upload.array('files'), async (req: Request, res: Response) => {
   const textContent: string[] = [];
   await Promise.all(
     files.map(async (file) => {
-      // const text = await extract(file.buffer);
+      const record = await db.savePDF(file.originalname, BUCKET_NAME, file.size);
+      console.log('RECORD', record);
       minio.upload(file.originalname, file.buffer);
+      // const text = await extract(file.buffer);
     }),
   );
 
   return res.send(textContent.join(''));
+});
+
+router.get('/test', async (req: Request, res: Response) => {
+  const data = await db.find();
+  return res.status(200).json(data);
 });
 
 /**

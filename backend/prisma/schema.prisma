@@ -1,0 +1,20 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pdf {
+  id        Int      @id @default(autoincrement())
+  filename   String   @unique
+  bucket    String   @db.VarChar(255)
+  fileSize   Int
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+}

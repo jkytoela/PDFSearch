@@ -1,7 +1,6 @@
 import { Client } from 'minio';
-import { options, policy } from '../constants/minioConfig';
+import { options, policy, BUCKET_NAME } from '../constants/minioConfig';
 
-const BUCKET_NAME = 'pdfs';
 const client = new Client(options);
 
 export async function upload(filename: string, buffer: Buffer) {

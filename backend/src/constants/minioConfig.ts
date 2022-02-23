@@ -6,6 +6,8 @@ export const options = {
   secretKey: 'secret123',
 };
 
+export const BUCKET_NAME = 'pdfs';
+
 export const policy = {
   Version: '2012-10-17',
   Statement: [
