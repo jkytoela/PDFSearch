@@ -23,3 +23,7 @@ export async function find(ids: number[]) {
     },
   });
 }
+
+export async function all() {
+  return prisma.pdf.findMany();
+}

@@ -52,15 +52,18 @@ router.post('/', upload.array('files'), async (req: Request, res: Response) => {
 });
 
 /**
- * Search text from PDF's
- * /api/pdf?text=foobar
+ * Get all PDF's or search text from PDF's,
+ * eg. /api/pdf?text=foobar
  */
 router.get('/', async (req: Request, res: Response) => {
   const { text } = req.query;
-  if (!text || !text?.length) {
-    return res.status(400).json({ message: 'Invalid query' });
+  console.log(text);
+  if (!text) {
+    const pdfs = await db.all();
+    return res.status(400).json(pdfs);
   }
 
+  // Return cached response if it exists
   const cache = await redis.get(`${text}`);
   if (cache !== null) {
     return res.status(200).json(JSON.parse(cache));
