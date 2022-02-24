@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Client } from '@elastic/elasticsearch';
+import { ESSource, ESSearchBody } from '../types';
 
 const client = new Client({
   node: 'http://elasticsearch:9200',
@@ -18,27 +19,9 @@ export async function index(id: number, data: string) {
   });
 }
 
-type Source = {
-  id: number;
-  data: string;
-};
-
-type SearchBody = {
-  index: string;
-  query: {
-    match: { data: string };
-  };
-  highlight: {
-    'fragment_size': string;
-    fields: {
-      data: unknown;
-    };
-  };
-};
-
 export async function search(str: string) {
   await client.indices.refresh({ index: DEFAULT_INDEX });
-  const response = await client.search<Source, SearchBody>({
+  const response = await client.search<ESSource, ESSearchBody>({
     index: DEFAULT_INDEX,
     query: {
       match: { data: str },

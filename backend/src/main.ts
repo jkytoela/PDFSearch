@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import express, {
   Application,
 } from 'express';
@@ -8,14 +9,22 @@ import redis from './services/redis';
 const SERVER_URL = 'http://localhost';
 const PORT = 8000;
 
-const app: Application = express();
-redis.connect();
-app.use(cors());
-app.use(express.json());
+async function startServer() {
+  const app: Application = express();
 
-app.use('/api/pdf', PDF);
+  await redis.connect();
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.info(`PDFSearch API running at ${SERVER_URL}:${PORT}`);
-});
+  app.use(cors());
+  app.use(express.json());
+
+  app.use('/api/pdf', PDF);
+
+  app.listen(PORT, () => {
+    console.info(`PDFSearch API listening at ${SERVER_URL}:${PORT}`);
+  }).on('error', (error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
+
+startServer();
