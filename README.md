@@ -7,9 +7,12 @@ Technologies used:
 - TypeScript
 - Express.js
 - React
+- PostgreSQL
+- Redis
 - MinIO (S3 compatible object storage)
 - Apache Tika
 - ElasticSearch
+- nginx
 
 TODO:
 - The front-end search functionality
