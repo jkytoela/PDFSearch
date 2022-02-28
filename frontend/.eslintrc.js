@@ -1,29 +1,29 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: "module",
+    sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
   },
   settings: {
     react: {
-      version: "detect",
+      version: 'detect',
     },
   },
   extends: [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react-hooks/recommended",
-    "plugin:react/recommended",
-    "prettier",
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:react/recommended',
+    'prettier',
   ],
   rules: {
-    "@typescript-eslint/quotes": [
+    '@typescript-eslint/quotes': [
       2,
-      "single",
+      'single',
       {
-        "avoidEscape": true
+        'avoidEscape': true
       }
     ],
   },

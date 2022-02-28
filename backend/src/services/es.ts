@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Client } from '@elastic/elasticsearch';
+import { ESSource, ESSearchBody } from '../types';
 
 const client = new Client({
   node: 'http://elasticsearch:9200',
@@ -20,16 +21,23 @@ export async function index(id: number, data: string) {
 
 export async function search(str: string) {
   await client.indices.refresh({ index: DEFAULT_INDEX });
-  const result = await client.search<{ id: number; data: string }>({
+  const response = await client.search<ESSource, ESSearchBody>({
     index: DEFAULT_INDEX,
     query: {
       match: { data: str },
     },
+    highlight: {
+      fragment_size: 20,
+      fields: { data: {} },
+    },
   });
 
-  // Get only ID's from the results, because that's the only thing we need
-  const ids = result.hits.hits.map((hit) => hit._source!.id);
+  // Get ID's stored in DB and highlights
+  // TODO: Read more about ES types and fix those code smells
+  const result = response.hits.hits.map(({ _source, highlight }) => ({
+    id: _source!.id,
+    highlights: highlight!.data,
+  }));
 
-  // Remove duplicates
-  return [...new Set(ids)];
+  return result;
 }
