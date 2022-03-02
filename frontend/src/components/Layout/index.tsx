@@ -15,6 +15,8 @@ import {
 } from '@chakra-ui/react';
 import { FiMenu, FiSearch, FiPlus } from 'react-icons/fi';
 import SidebarContent from './SidebarContent';
+import { store } from '../../store';
+import useDebounce from '../../hooks/useDebounce';
 
 interface ILayout {
   children: React.ReactNode;
@@ -22,6 +24,14 @@ interface ILayout {
 
 const Layout = ({ children }: ILayout) => {
   const sidebar = useDisclosure();
+  const dispatch = store.useDispatch();
+  const [searchText, setSearchText] = React.useState<string>('');
+  const debouncedSearchText = useDebounce<string>(searchText, 500);
+
+  React.useEffect(() => {
+    dispatch(['search', debouncedSearchText]);
+  }, [debouncedSearchText, dispatch]);
+
   return (
     <ChakraProvider>
       <Box
@@ -63,10 +73,13 @@ const Layout = ({ children }: ILayout) => {
               <InputLeftElement color="gray.500">
                 <FiSearch />
               </InputLeftElement>
-              <Input placeholder="Search..." />
+              <Input
+                placeholder="Search..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
             </InputGroup>
-
-            <Button leftIcon={<FiPlus />} colorScheme="gray" variant="solid">
+            <Button leftIcon={<FiPlus />} colorScheme="green" variant="solid">
               Upload
             </Button>
           </Flex>

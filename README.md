@@ -7,11 +7,11 @@ Technologies used:
 - TypeScript
 - Express.js
 - React
-- PostgreSQL
-- Redis
 - MinIO (S3 compatible object storage)
 - Apache Tika
 - ElasticSearch
+- PostgreSQL
+- Redis
 - nginx
 
 TODO:
