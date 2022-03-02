@@ -56,38 +56,41 @@ router.post('/', upload.array('files'), async (req: Request, res: Response) => {
  */
 router.get('/', async (req: Request, res: Response) => {
   const { text } = req.query;
-  console.log(text);
-  if (!text) {
-    const pdfs = await db.all();
-    return res.status(400).json(pdfs);
+  try {
+    if (!text) {
+      const pdfs = await db.all();
+      return res.status(200).json(pdfs);
+    }
+
+    // Return cached response if it exists
+    const cache = await redis.get(`${text}`);
+    if (cache !== null) {
+      return res.status(200).json(JSON.parse(cache));
+    }
+
+    // Get list of id's that match to the search
+    const searchResults = await es.search(`${text}`);
+    if (!searchResults) {
+      redis.setEx(`${text}`, 600, JSON.stringify([]));
+      return res.status(200).json([]);
+    }
+
+    // SearchResults contains IDs used in the DB
+    const ids = searchResults.map((result) => result.id);
+
+    // Get the PDFs
+    const pdfs = await db.find(ids);
+
+    // Merge highlights with PDFs
+    const results = pdfs.map((item, i) => ({
+      ...item,
+      highlights: searchResults[i].highlights,
+    }));
+
+    return res.status(200).json(results);
+  } catch (error) {
+    return res.status(500).json(error);
   }
-
-  // Return cached response if it exists
-  const cache = await redis.get(`${text}`);
-  if (cache !== null) {
-    return res.status(200).json(JSON.parse(cache));
-  }
-
-  // Get list of id's that match to the search
-  const searchResults = await es.search(`${text}`);
-  if (!searchResults) {
-    redis.setEx(`${text}`, 600, JSON.stringify([]));
-    return res.status(200).json([]);
-  }
-
-  // SearchResults contains IDs used in the DB
-  const ids = searchResults.map((result) => result.id);
-
-  // Get the PDFs
-  const pdfs = await db.find(ids);
-
-  // Merge highlights with PDFs
-  const results = pdfs.map((item, i) => ({
-    ...item,
-    highlights: searchResults[i].highlights,
-  }));
-
-  return res.status(200).json(results);
 });
 
 export default router;

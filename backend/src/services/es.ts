@@ -20,7 +20,6 @@ export async function index(id: number, data: string) {
 }
 
 export async function search(str: string) {
-  await client.indices.refresh({ index: DEFAULT_INDEX });
   const response = await client.search<ESSource, ESSearchBody>({
     index: DEFAULT_INDEX,
     query: {

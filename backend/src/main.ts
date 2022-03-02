@@ -11,7 +11,6 @@ const PORT = 8000;
 
 async function startServer() {
   const app: Application = express();
-
   await redis.connect();
 
   app.use(cors());
