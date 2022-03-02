@@ -9,9 +9,10 @@ export const getPdfs = async ({ text }: { text: string }): Promise<PDF[]> => {
 
   // The data should be PDF[], but...
   const data = await axios.get<PDF[]>(url);
-  
+
   // ... can't be sure, so parse and validate it
-  return PDFResponse.parse(data);
+  const validated = PDFResponse.parse(data);
+  return validated;
 };
 
 type QueryFnType = typeof getPdfs;
