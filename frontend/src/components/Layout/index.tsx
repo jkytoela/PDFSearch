@@ -66,7 +66,7 @@ const Layout = ({ children }: ILayout) => {
               <Input placeholder="Search..." />
             </InputGroup>
 
-            <Button leftIcon={<FiPlus />} colorScheme="gray" variant="solid">
+            <Button leftIcon={<FiPlus />} colorScheme="green" variant="solid">
               Upload
             </Button>
           </Flex>
