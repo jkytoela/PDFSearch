@@ -79,7 +79,6 @@ const Layout = ({ children }: ILayout) => {
                 onChange={(e) => setSearchText(e.target.value)}
               />
             </InputGroup>
-
             <Button leftIcon={<FiPlus />} colorScheme="green" variant="solid">
               Upload
             </Button>

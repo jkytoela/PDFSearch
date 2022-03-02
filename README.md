@@ -10,6 +10,9 @@ Technologies used:
 - MinIO (S3 compatible object storage)
 - Apache Tika
 - ElasticSearch
+- PostgreSQL
+- Redis
+- nginx
 
 TODO:
 - The front-end search functionality
